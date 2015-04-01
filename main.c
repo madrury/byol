@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <editline/readline.h>
 
+#include "parser.h"
 #include "mpc/mpc.h"
 
 void print_header() {
@@ -9,7 +10,7 @@ void print_header() {
   puts("Press Ctrl+c to Exit\n");
 }
 
-long eval_op(long x, char* op, long y) {
+long eval_op(char* op, long x, long y) {
   if (strcmp(op, "+") == 0) { return x+y; }
   if (strcmp(op, "-") == 0) { return x-y; }
   if (strcmp(op, "*") == 0) { return x*y; }
@@ -24,13 +25,12 @@ long eval(mpc_ast_t* t) {
     x = atoi(t->contents);
   /* Recurse */
   } else {
-    printf("In else clause.\n");
     char* op = t->children[1]->contents;
     x = eval(t->children[2]);
 
     int i = 3;
     while (strstr(t->children[i]->tag, "expr")) {
-      x = eval_op(x, op, eval(t->children[i]));
+      x = eval_op(op, x, eval(t->children[i]));
       i++;
     }
   }
@@ -40,21 +40,7 @@ long eval(mpc_ast_t* t) {
 
 int main(int argc, char** argv) {
 
-  /* Setup parser */
-  mpc_parser_t* Number = mpc_new("number");
-  mpc_parser_t* Operator = mpc_new("operator");
-  mpc_parser_t* Expr = mpc_new("expr");
-  mpc_parser_t* Lispy = mpc_new("lispy");
-
-  mpca_lang(MPCA_LANG_DEFAULT,
-  "                                                    \
-    number   : /-?[0-9]+/ ;                            \
-    operator : '+' | '-' | '*' | '/' ;                 \
-    expr     : <number> | '(' <operator> <expr>+ ')' ; \
-    lispy    : /^/ <operator> <expr>+ /$/ ;            \
-  ",
-  Number, Operator, Expr, Lispy);
-
+  mlisp_parser_t* parser = mlisp_parser_init();
 
   print_header();
 
@@ -66,7 +52,7 @@ int main(int argc, char** argv) {
 
     /* Attempt to parse user input. */
     mpc_result_t r;
-    if (mpc_parse("<stdin>", input, Lispy, &r)) {
+    if (mpc_parse("<stdin>", input, parser->Lispy, &r)) {
       long result = eval(r.output);
       printf("%li\n", result);
       mpc_ast_delete(r.output);
@@ -78,6 +64,6 @@ int main(int argc, char** argv) {
     free(input);
   }
 
-  mpc_cleanup(4, Number, Operator, Expr, Lispy);
+  mlisp_parser_destroy(parser);
   return 0;
 }
