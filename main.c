@@ -3,38 +3,12 @@
 #include <editline/readline.h>
 
 #include "parser.h"
+#include "eval.h"
 #include "mpc/mpc.h"
 
 void print_header() {
   puts("Mlisp Version 0.0.1");
   puts("Press Ctrl+c to Exit\n");
-}
-
-long eval_op(char* op, long x, long y) {
-  if (strcmp(op, "+") == 0) { return x+y; }
-  if (strcmp(op, "-") == 0) { return x-y; }
-  if (strcmp(op, "*") == 0) { return x*y; }
-  if (strcmp(op, "/") == 0) { return x/y; }
-  return 0;
-}
-
-long eval(mpc_ast_t* t) {
-  long x;
-  /* Base case */
-  if(strstr(t->tag, "number")) {
-    x = atoi(t->contents);
-  /* Recurse */
-  } else {
-    char* op = t->children[1]->contents;
-    x = eval(t->children[2]);
-
-    int i = 3;
-    while (strstr(t->children[i]->tag, "expr")) {
-      x = eval_op(op, x, eval(t->children[i]));
-      i++;
-    }
-  }
-  return x;
 }
 
 
@@ -53,7 +27,7 @@ int main(int argc, char** argv) {
     /* Attempt to parse user input. */
     mpc_result_t r;
     if (mpc_parse("<stdin>", input, parser->Lispy, &r)) {
-      long result = eval(r.output);
+      long result = mlisp_eval(r.output);
       printf("%li\n", result);
       mpc_ast_delete(r.output);
     } else {
