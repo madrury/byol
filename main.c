@@ -9,6 +9,35 @@ void print_header() {
   puts("Press Ctrl+c to Exit\n");
 }
 
+long eval_op(long x, char* op, long y) {
+  if (strcmp(op, "+") == 0) { return x+y; }
+  if (strcmp(op, "-") == 0) { return x-y; }
+  if (strcmp(op, "*") == 0) { return x*y; }
+  if (strcmp(op, "/") == 0) { return x/y; }
+  return 0;
+}
+
+long eval(mpc_ast_t* t) {
+  long x;
+  /* Base case */
+  if(strstr(t->tag, "number")) {
+    x = atoi(t->contents);
+  /* Recurse */
+  } else {
+    printf("In else clause.\n");
+    char* op = t->children[1]->contents;
+    x = eval(t->children[2]);
+
+    int i = 3;
+    while (strstr(t->children[i]->tag, "expr")) {
+      x = eval_op(x, op, eval(t->children[i]));
+      i++;
+    }
+  }
+  return x;
+}
+
+
 int main(int argc, char** argv) {
 
   /* Setup parser */
@@ -38,7 +67,8 @@ int main(int argc, char** argv) {
     /* Attempt to parse user input. */
     mpc_result_t r;
     if (mpc_parse("<stdin>", input, Lispy, &r)) {
-      mpc_ast_print(r.output);
+      long result = eval(r.output);
+      printf("%li\n", result);
       mpc_ast_delete(r.output);
     } else {
       mpc_err_print(r.error);
