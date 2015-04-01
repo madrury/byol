@@ -1,3 +1,4 @@
+#include <math.h>
 #include "eval.h"
 #include "mpc/mpc.h"
 
@@ -25,5 +26,9 @@ long mlisp_eval_op(char* op, long x, long y) {
   if (strcmp(op, "-") == 0) { return x-y; }
   if (strcmp(op, "*") == 0) { return x*y; }
   if (strcmp(op, "/") == 0) { return x/y; }
+  if (strcmp(op, "%") == 0) { return x%y; }
+  if (strcmp(op, "^") == 0) { return pow(x, y); }
+  if (strcmp(op, "max") == 0) { return x > y ? x : y; }
+  if (strcmp(op, "min") == 0) { return x < y ? x : y; }
   return 0;
 }
