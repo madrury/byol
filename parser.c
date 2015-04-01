@@ -10,8 +10,8 @@ mlisp_parser_t* mlisp_parser_init(void) {
   parser->Lispy = mpc_new("lispy");
 
   mpca_lang(MPCA_LANG_DEFAULT,
-  "                                                    \
-  number   : /-?[0-9]+/ ;                            \
+  "                                                  \
+  number   : /-?[0-9]+(\\.[0-9]+)?/ ;                \
   operator : '+' | '-' | '*' | '/' ;                 \
   expr     : <number> | '(' <operator> <expr>+ ')' ; \
   lispy    : /^/ <operator> <expr>+ /$/ ;            \
