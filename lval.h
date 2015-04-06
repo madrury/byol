@@ -1,9 +1,9 @@
 #ifndef LVAL_T
 #define LVAL_T
 typedef struct lval_t {
-  int type;
-  long num;
-  int err;
+     int type;
+     long num;
+     int err;
 } lval_t;
 #endif /* LVAL_T */
 
