@@ -60,7 +60,7 @@ lval_t* mlisp_eval_binary_op(char* op, lval_t* x, lval_t* y) {
         return y->num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x->num / y->num); 
     }
     if (strcmp(op, "%") == 0) {
-        return y->num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x->num / y->num); 
+        return y->num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x->num % y->num); 
     }
     if (strcmp(op, "^") == 0) { return lval_num(pow(x->num, y->num)); }
     if (strcmp(op, "max") == 0) { return x->num > y->num ? x : y; }
