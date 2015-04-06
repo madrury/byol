@@ -4,6 +4,7 @@
 
 #include "parser.h"
 #include "eval.h"
+#include "lval.h"
 #include "mpc/mpc.h"
 
 void print_header() {
@@ -27,8 +28,8 @@ int main(int argc, char** argv) {
     /* Attempt to parse user input. */
     mpc_result_t r;
     if (mpc_parse("<stdin>", input, parser->Lispy, &r)) {
-      long result = mlisp_eval(r.output);
-      printf("%li\n", result);
+      lval_t* result = mlisp_eval(r.output);
+      lval_println(result);
       mpc_ast_delete(r.output);
     } else {
       mpc_err_print(r.error);

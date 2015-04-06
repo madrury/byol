@@ -1,5 +1,6 @@
 #include "mpc/mpc.h"
+#include "lval.h"
 
-long mlisp_eval(mpc_ast_t* t);
-long mlisp_eval_unary_op(char* op, long x);
-long mlisp_eval_binary_op(char* op, long x, long y);
+lval_t* mlisp_eval(mpc_ast_t* t);
+lval_t* mlisp_eval_unary_op(char* op, lval_t* x);
+lval_t* mlisp_eval_binary_op(char* op, lval_t* x, lval_t* y);

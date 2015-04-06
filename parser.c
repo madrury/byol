@@ -12,7 +12,7 @@ mlisp_parser_t* mlisp_parser_init(void) {
   mpca_lang(MPCA_LANG_DEFAULT,
   "                                                                  \
   number   : /-?[0-9]+(\\.[0-9]+)?/ ;                                \
-  operator : '+' | '-' | '*' | '/' | '%' | '^' | \"max\" |\"min\" ; \
+  operator : '+' | '-' | '*' | '/' | '%' | '^' | \"max\" | \"min\" ; \
   expr     : <number> | '(' <operator> <expr>+ ')' ;                 \
   lispy    : /^/ <operator> <expr>+ /$/ ;                            \
   ",
