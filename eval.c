@@ -1,4 +1,4 @@
-include <math.h>
+#include <math.h>
 #include "eval.h"
 #include "lval.h"
 #include "mpc/mpc.h"
@@ -51,7 +51,7 @@ lval_t* mlisp_eval_unary_op(char* op, lval_t* x) {
 lval_t* mlisp_eval_binary_op(char* op, lval_t* x, lval_t* y) {
     /* Pass through an error. */
     if (x->type == LVAL_ERR) { return x; }
-    if (x->type == LVAL_ERR) { return y; }
+    if (y->type == LVAL_ERR) { return y; }
 
     if (strcmp(op, "+") == 0) { return lval_num(x->num + y->num); }
     if (strcmp(op, "-") == 0) { return lval_num(x->num - y->num); }
