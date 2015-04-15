@@ -37,7 +37,10 @@ lval_t* lval_from_ast(mpc_ast_t* t);
 int _is_metachar(mpc_ast_t* t);
 lval_t* _lval_from_num(mpc_ast_t* t);
 lval_t* _lval_from_sym(mpc_ast_t* t);
-lval_t* _lval_symexpr_append(lval_t* v, lval_t* x);
+
+lval_t* lval_symexpr_append(lval_t* v, lval_t* x);
+lval_t* lval_symexpr_pop(lval_t* v, int i);
+lval_t* lval_symexpr_take(lval_t* v, int i);
 
 void lval_print(lval_t* v);
 void lval_println(lval_t* v);

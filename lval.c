@@ -83,7 +83,7 @@ lval_t* lval_from_ast(mpc_ast_t* t) {
 
     for (int i = 0; i < t->children_num; i++) {
         if(!_is_metachar(t->children[i])) {
-            v = _lval_symexpr_append(v, lval_from_ast(t->children[i]));
+            v = lval_symexpr_append(v, lval_from_ast(t->children[i]));
         }
     }
     return v;
@@ -109,14 +109,39 @@ lval_t* _lval_from_sym(mpc_ast_t* t) {
     return lval_sym(t->contents);
 }
 
-/* Extend array of lvals by one and append to end. */
-lval_t* _lval_symexpr_append(lval_t* v, lval_t* x) {
+/* Extend array of lvals by one and append an lval to the end. */
+lval_t* lval_symexpr_append(lval_t* v, lval_t* x) {
+    if(v->type != LVAL_SYMEXPR) {
+        return lval_err("Expected a symexpr for appending.");
+    }
     v->n_cells++;
     v->cells = realloc(v->cells, sizeof(lval_t*) * v->n_cells);
     v->cells[v->n_cells-1] = x;
     return v;
 }
 
+/* Lookup an lval by index and remove it from the array. */
+lval_t* lval_symexpr_pop(lval_t* v, int i) {
+    if(i < 0) { 
+        return lval_err("Negative indexing an lval not allowed."); 
+    }
+    if(i > v->n_cells - 1) { 
+        return lval_err("Index out of bounds."); 
+    }
+    if(v->type != LVAL_SYMEXPR) { 
+        return lval_err("Expected a symexpr for get."); 
+    }
+    lval_t* x = v->cells[i];
+    memmove(&v->cells[i], &v->cells[i+1], sizeof(lval_t*) * (v->n_cells - i - 1));
+    v->n_cells--;
+    v->cells = realloc(v->cells, sizeof(lval_t*) * v->n_cells);
+}
+
+lval_t* lval_symexpr_take(lval_t* v, int i) {
+    lval_t* x = lval_symexpr_take(v, i);
+    lval_destroy(v);
+    return x;
+}
 
 /* IO */
 void lval_print(lval_t* v) {
