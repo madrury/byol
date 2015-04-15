@@ -4,7 +4,8 @@
 #define MLISP_PARSER_T
 typedef struct mlisp_parser_t {
     mpc_parser_t* Number;
-    mpc_parser_t* Operator;
+    mpc_parser_t* Symbol;
+    mpc_parser_t* SymExpr;
     mpc_parser_t* Expr;
     mpc_parser_t* Lispy;
 } mlisp_parser_t;

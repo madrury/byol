@@ -1,4 +1,4 @@
-#include "mpc/mpc.c"
+#include "mpc/mpc.h"
 
 #ifndef LVAL_T
 #define LVAL_T
@@ -34,13 +34,14 @@ void lval_destroy(lval_t* v);
 void _destroy_symexpr_cells(lval_t* v);
 
 lval_t* lval_from_ast(mpc_ast_t* t);
+int _is_metachar(mpc_ast_t* t);
 lval_t* _lval_from_num(mpc_ast_t* t);
 lval_t* _lval_from_sym(mpc_ast_t* t);
-lval_t* _lval_symexpr_add(lval_t* v, lval_t* x);
+lval_t* _lval_symexpr_append(lval_t* v, lval_t* x);
 
 void lval_print(lval_t* v);
 void lval_println(lval_t* v);
 void _lval_print_err(lval_t* v);
 void _lval_print_num(lval_t* v);
 void _lval_print_sym(lval_t* v);
-void _lval_print_symexpr(lval_t* v);
+void _lval_print_symexpr(lval_t* v, char open, char close);

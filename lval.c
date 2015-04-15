@@ -47,59 +47,73 @@ void lval_destroy(lval_t* v) {
     free(v);
 }
 
+/* Recursively free data. */
 void _destroy_symexpr_cells(lval_t* v) {
     if (v->type != LVAL_SYMEXPR) {
-        printf(stderr, "Attempt to free symexpr on non symepr type!");
+        printf("Attempt to free symexpr on non symepr type!", stderr);
         exit(EXIT_FAILURE);
     }
     for (int i = 0; i < v->n_cells; i++) {
-        lval_destroy(c->cells[i]);
+        lval_destroy(v->cells[i]);
     }
     free(v->cells);
 }
 
 
-/* Create an lval from an abstract syntax tree */
+/**
+ * Create an lval from an abstract syntax tree. 
+ * 
+ *   Each node in the tree can be identified using the tag attribute.
+ *     number : Contents is a number, has no children.
+ *     symbol : Contents is a character representing an operation. Has
+ *              no children.
+ *     symepr : Has children, represents a symbolic expression.
+ *     > : The root node of a (sub)tree.
+ *     regex : Represents an input boundry.
+*/
 lval_t* lval_from_ast(mpc_ast_t* t) {
 
-    lval_t* x;
+    lval_t* v;
     
-    /* Each node in the tree must be a number, symbol or symbolic expression,
-       with only symbolic expressions having child nodes. */
-    if(strstr(t->tag, "number")) { x = _lval_from_num(t); }
-    if(strstr(t->tag, "symbol")) { x = _lval_from_sym(t); }
+    if(strstr(t->tag, "number")) { v = _lval_from_num(t); }
+    if(strstr(t->tag, "symbol")) { v = _lval_from_sym(t); }
 
-    /* Root or symbolic expression. */
-    if(strcmp(t->tag, ">") == 0) { x = lval_symexpr(); }
-    if(strstr(t->tag, "symexpr")) { x = lval_symexpr(); }
+    if(strcmp(t->tag, ">") == 0) { v = lval_symexpr(); }
+    if(strstr(t->tag, "symexpr")) { v = lval_symexpr(); }
+
     for (int i = 0; i < t->children_num; i++) {
-        if (strcmp(t->children[i]->contents, "(") == 0 ||
-            strcmp(t->children[i]->contents, ")") == 0 ||
-            strcmp(t->children[i]->contents, "{") == 0 ||
-            strcmp(t->children[i]->contents, "}") == 0 ) {
- 
-            x = _lval_symexpr_append(x, lval_from_ast(t->children[i]));
-
+        if(!_is_metachar(t->children[i])) {
+            v = _lval_symexpr_append(v, lval_from_ast(t->children[i]));
         }
     }
+    return v;
+}
 
-    return x;
+/* Does this ast represent a single metachar? */
+int _is_metachar(mpc_ast_t* t) {
+    return (strcmp(t->contents, "(") == 0 ||
+            strcmp(t->contents, ")") == 0 ||
+            strcmp(t->contents, "{") == 0 ||
+            strcmp(t->contents, "}") == 0 ||
+            strcmp(t->tag, "regex") == 0 
+    );
 }
 
 lval_t* _lval_from_num(mpc_ast_t* t) {
     errno = 0;
     long x = strtol(t->contents, NULL, 10);
-    return errno != ERANGE ? lval_num(x) : lval_err("Invalid number.")
+    return errno != ERANGE ? lval_num(x) : lval_err("Invalid number.");
 }
 
 lval_t* _lval_from_sym(mpc_ast_t* t) {
     return lval_sym(t->contents);
 }
 
+/* Extend array of lvals by one and append to end. */
 lval_t* _lval_symexpr_append(lval_t* v, lval_t* x) {
-    v->n_cells++
-    v->cells = ralloc(v->cells, sizeof(lval_t*) * v->n_cells);
-    v->cells[v->n_cells - 1] = x;
+    v->n_cells++;
+    v->cells = realloc(v->cells, sizeof(lval_t*) * v->n_cells);
+    v->cells[v->n_cells-1] = x;
     return v;
 }
 
@@ -130,10 +144,15 @@ void _lval_print_sym(lval_t* v) {
      printf("%s", v->sym);
 }
 
+/* Print boundry parenthesis, then data. */
 void _lval_print_symexpr(lval_t* v, char open, char close) {
     putchar(open);
     for(int i = 0; i < v->n_cells; i++) {
-        lval_print(v->cells[i]);
+        if(v->cells[i]) {
+            lval_print(v->cells[i]);
+        }
+        else { 
+        }
         if( i != (v->n_cells - 1)) { putchar(' '); }
     }
     putchar(close);
