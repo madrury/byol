@@ -138,7 +138,7 @@ lval_t* lval_symexpr_pop(lval_t* v, int i) {
 }
 
 lval_t* lval_symexpr_take(lval_t* v, int i) {
-    lval_t* x = lval_symexpr_take(v, i);
+    lval_t* x = lval_symexpr_get(v, i);
     lval_destroy(v);
     return x;
 }
@@ -175,8 +175,6 @@ void _lval_print_symexpr(lval_t* v, char open, char close) {
     for(int i = 0; i < v->n_cells; i++) {
         if(v->cells[i]) {
             lval_print(v->cells[i]);
-        }
-        else { 
         }
         if( i != (v->n_cells - 1)) { putchar(' '); }
     }
